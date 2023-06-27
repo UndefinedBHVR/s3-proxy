@@ -1,5 +1,5 @@
 # S3-Proxy
-## A minimal simple cloudflare worker for proxying s3 get requests through cloudflare workers.
+A minimal simple cloudflare worker for proxying s3 get requests through cloudflare workers.
 
 ## Usage
 Update the variables in wrangler.toml with the following information.
