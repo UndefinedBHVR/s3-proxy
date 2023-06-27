@@ -34,7 +34,6 @@ export default {
 		if(!bucket) {
 			return new Response(JSON.stringify({"message": "unexpected path length"}), {status: 400})
 		} else if (bucket in env.bucket){
-			console.log(env.bucket[bucket]);
 			cache = await caches.open("buckets:"+bucket);
 			duration = env.bucket[bucket].duration;
 		}
