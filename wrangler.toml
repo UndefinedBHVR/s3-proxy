@@ -1,0 +1,8 @@
+name = "s3-proxy"
+main = "src/worker.ts"
+compatibility_date = "2023-06-26"
+
+[vars]
+ENDPOINT = "s3.example.com"
+ACCESS_KEY_ID = "ACCESS_KEY_ID"
+ACCESS_KEY = "ACCESS_KEY"
