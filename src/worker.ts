@@ -1,14 +1,25 @@
 import { AwsClient } from 'aws4fetch'
 export interface Env {
-	ACCESS_KEY: string;
-	ACCESS_KEY_ID: string;
-	ENDPOINT: string;
+	access_key: string;
+	access_key_id: string;
+	endpoint: string;
+	duration: string;
+	bucket: BucketList;
+}
+
+type BucketList = {
+	[key: string]: Bucket
+}
+
+type Bucket = {
+	duration: string
 }
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		let duration = env.duration;
 		// Lets cache requests, I guess.
-		const cache = caches.default
+		let cache = caches.default
 
 		// Convert the incoming url into the URL type for convenience
 		let url = new URL(request.url);
@@ -18,8 +29,18 @@ export default {
 			return new Response("", {status: 418});
 		}
 
+		let bucket: string = url.pathname.split("/")[1];
+
+		if(!bucket) {
+			return new Response(JSON.stringify({"message": "unexpected path length"}), {status: 400})
+		} else if (bucket in env.bucket){
+			console.log(env.bucket[bucket]);
+			cache = await caches.open("buckets:"+bucket);
+			duration = env.bucket[bucket].duration;
+		}
+		
 		// Create our url from the endpoint by combining the protocol, the endpoint url, and the path.
-		let endpoint = new URL("https://"+env.ENDPOINT+url.pathname);
+		let endpoint = new URL("https://"+env.endpoint+url.pathname);
 		
 		// Store the endpoint for reuse
 		let key = new Request(endpoint);
@@ -32,8 +53,8 @@ export default {
 			console.log(`No data in cache for: ${endpoint}.`);
 			// Construct client
 			let aws = new AwsClient({
-				"accessKeyId": env.ACCESS_KEY_ID,
-				"secretAccessKey": env.ACCESS_KEY,
+				"accessKeyId": env.access_key_id,
+				"secretAccessKey": env.access_key,
 				"service": "s3",
 			});
 
@@ -42,7 +63,7 @@ export default {
 
 			// Make the headers mutable.
 			response = new Response(response.body, response);
-			response.headers.set("Cache-Control", "s-maxage=10");
+			response.headers.set("Cache-Control", "s-maxage="+duration);
 			
 			// Shove it in cache
 			ctx.waitUntil(cache.put(key, response.clone()));

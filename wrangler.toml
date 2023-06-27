@@ -3,6 +3,16 @@ main = "src/worker.ts"
 compatibility_date = "2023-06-26"
 
 [vars]
-ENDPOINT = "s3.example.com"
-ACCESS_KEY_ID = "ACCESS_KEY_ID"
-ACCESS_KEY = "ACCESS_KEY"
+# What endpoint we are located at
+endpoint = "s3.example.com"
+# Our access key's id
+access_key_id = "ACCESS_KEY_ID"
+# Our access key itself
+access_key = "ACCESS_KEY"
+# The default duration we should keep a file alive for
+duration = "300"
+
+# An example bucket
+[vars.bucket.example]
+# Duration in seconds
+duration = "600"
